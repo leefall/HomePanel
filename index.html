@@ -57,10 +57,10 @@
     position: relative; z-index: 2;
     width: 100%; height: 100%;
     display: grid;
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: auto auto auto;
     grid-template-columns: 1fr;
-    gap: 10px;
-    padding: 12px 14px;
+    gap: 8px;
+    padding: 10px 12px;
   }
 
   /* ── Glass panel ── */
@@ -192,60 +192,58 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     padding: 8px 4px;
     border-right: 1px solid var(--border);
-    font-size: 14px;
+    font-size: 16px;
   }
   .fc-row:last-child { border-right: none; }
-  .fc-day { color: var(--muted); font-size: 13px; }
-  .fc-icon { font-size: 22px; }
-  .fc-hi { color: var(--warm); font-weight: 600; }
-  .fc-lo { color: var(--accent); }
-  .fc-precip { display: flex; align-items: center; gap: 2px; color: var(--accent); font-size: 13px; }
+  .fc-day { color: var(--muted); font-size: 15px; font-weight: 600; }
+  .fc-icon { font-size: 28px; }
+  .fc-hi { color: var(--warm); font-weight: 600; font-size: 16px; }
+  .fc-lo { color: var(--accent); font-size: 15px; }
+  .fc-precip { display: flex; align-items: center; gap: 2px; color: var(--accent); font-size: 14px; }
   .fc-precip-num { font-variant-numeric: tabular-nums; }
 
-  /* ── Row 3: News ── */
+  /* ── Row 3: News (3 stacked rows) ── */
   #news-panel {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     overflow: hidden;
   }
   .news-section {
     display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    border-right: 1px solid var(--border);
-    padding-right: 14px;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0;
   }
-  .news-section:last-child { border-right: none; padding-right: 0; }
+  .news-section:last-child { border-bottom: none; }
   .news-section-title {
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 2px;
     font-weight: 700;
-    margin-bottom: 10px;
     flex-shrink: 0;
+    width: 70px;
   }
   .title-nyt    { color: #81c784; }
   .title-yonhap { color: #ffb74d; }
   .title-bbc    { color: #e57373; }
-  .news-section-list { overflow: hidden; }
-  .news-item {
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    animation: fadeIn 0.4s ease;
-  }
-  .news-item:last-child { border-bottom: none; }
+  .news-section-list { flex: 1; min-width: 0; }
+  .news-item { animation: fadeIn 0.4s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
   .news-headline {
-    font-size: clamp(15px, 1.7vw, 19px);
-    line-height: 1.45;
+    font-size: clamp(18px, 2.2vw, 26px);
+    line-height: 1.4;
     color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .news-time {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--muted);
     margin-top: 3px;
   }
@@ -509,7 +507,7 @@ let newsBySource = { bbc: [], nyt: [], yonhap: [] };
 async function fetchNews() {
   for (const feed of CFG.newsFeeds) {
     const items = await fetchOneFeed(feed);
-    newsBySource[feed.id] = items.slice(0, 2);
+    newsBySource[feed.id] = items.slice(0, 1);
     renderSection(feed.id);
     await new Promise(r => setTimeout(r, 1000));
   }
