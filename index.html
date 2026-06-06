@@ -52,15 +52,15 @@
     );
   }
 
-  /* ── Layout: single column ── */
+  /* ── Layout: single column, fits 1280×800 ── */
   #app {
     position: relative; z-index: 2;
     width: 100%; height: 100%;
     display: grid;
-    grid-template-rows: auto auto auto auto;
+    grid-template-rows: 23vh 13vh 20vh 1fr;
     grid-template-columns: 1fr;
     gap: 8px;
-    padding: 10px 12px;
+    padding: 10px 14px;
   }
 
   /* ── Glass panel ── */
@@ -76,7 +76,7 @@
   /* ── Row 1: Clock + Weather ── */
   #top-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 2fr 3fr;
     gap: 10px;
     align-items: stretch;
   }
@@ -87,19 +87,20 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    padding: 12px 20px;
+    gap: 1px;
+    padding: 8px 16px;
+    overflow: hidden;
   }
   #date {
-    font-size: clamp(38px, 5vw, 60px);
+    font-size: clamp(16px, 2.8vh, 26px);
     color: var(--accent);
     font-weight: 300;
     letter-spacing: 0.5px;
   }
   #time {
-    font-size: clamp(80px, 12vw, 140px);
+    font-size: clamp(52px, 9vh, 80px);
     font-weight: 200;
-    letter-spacing: -4px;
+    letter-spacing: -3px;
     color: #fff;
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -107,7 +108,7 @@
   #time-sep { animation: blink 1s step-start infinite; }
   @keyframes blink { 50% { opacity: 0; } }
   #weekday {
-    font-size: clamp(32px, 4.2vw, 52px);
+    font-size: clamp(14px, 2.2vh, 22px);
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 3px;
@@ -118,30 +119,30 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 8px;
-    padding: 14px 24px;
+    gap: clamp(4px, 0.8vh, 10px);
+    padding: 10px 20px;
     overflow: hidden;
   }
   #weather-current {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
   }
-  #weather-icon { font-size: 64px; line-height: 1; flex-shrink: 0; }
+  #weather-icon { font-size: clamp(36px, 5.5vh, 52px); line-height: 1; flex-shrink: 0; }
   #weather-temp {
-    font-size: clamp(56px, 7vw, 88px);
+    font-size: clamp(36px, 6.5vh, 58px);
     font-weight: 200;
     color: #fff;
     line-height: 1;
   }
-  #weather-desc { font-size: 22px; color: var(--muted); margin-top: 4px; }
-  #weather-feels { font-size: 20px; color: var(--muted); }
-  #weather-hilo { font-size: 22px; margin-top: 4px; }
+  #weather-desc { font-size: clamp(14px, 2vh, 18px); color: var(--muted); }
+  #weather-feels { font-size: clamp(13px, 1.8vh, 17px); color: var(--muted); }
+  #weather-hilo { font-size: clamp(14px, 2vh, 18px); }
   #weather-details {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 20px;
-    font-size: 18px;
+    gap: 2px 16px;
+    font-size: clamp(13px, 1.8vh, 16px);
   }
   .wd-item { color: var(--muted); white-space: nowrap; }
   .wd-item span { color: var(--text); font-weight: 500; }
@@ -150,9 +151,9 @@
   .fx-down { color: var(--red); }
 
   /* ── Row 2: Hourly precip chart ── */
-  #precip-panel { padding: 10px 22px 12px; }
+  #precip-panel { padding: 6px 18px 8px; }
   #precip-title {
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: var(--muted);
@@ -162,7 +163,7 @@
     display: flex;
     align-items: flex-end;
     gap: 2px;
-    height: 72px;
+    height: calc(13vh - 42px);
     border-bottom: 1px solid rgba(255,255,255,0.15);
     padding-bottom: 4px;
     position: relative;
@@ -189,15 +190,13 @@
   }
 
   /* ── Row 3: 7-day forecast ── */
-  #forecast-panel {
-    padding: 14px 22px;
-  }
+  #forecast-panel { padding: 8px 18px; }
   #weather-section-title {
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: var(--muted);
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
   #forecast {
     display: grid;
@@ -208,20 +207,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    padding: 8px 4px;
+    gap: 2px;
+    padding: 4px 2px;
     border-right: 1px solid var(--border);
-    font-size: 16px;
   }
   .fc-row:last-child { border-right: none; }
-  .fc-day { color: var(--muted); font-size: 18px; font-weight: 600; }
-  .fc-icon { font-size: 32px; }
-  .fc-hi { color: var(--warm); font-weight: 600; font-size: 18px; }
-  .fc-lo { color: var(--accent); font-size: 17px; }
-  .fc-precip { display: flex; align-items: center; gap: 2px; color: var(--accent); font-size: 16px; }
+  .fc-day { color: var(--muted); font-size: clamp(12px, 1.8vh, 16px); font-weight: 600; }
+  .fc-icon { font-size: clamp(20px, 3vh, 28px); }
+  .fc-hi { color: var(--warm); font-weight: 600; font-size: clamp(13px, 1.9vh, 17px); }
+  .fc-lo { color: var(--accent); font-size: clamp(12px, 1.7vh, 16px); }
+  .fc-precip { display: flex; align-items: center; gap: 2px; color: var(--accent); font-size: clamp(11px, 1.6vh, 15px); }
   .fc-precip-num { font-variant-numeric: tabular-nums; }
 
-  /* ── Row 3: News (3 stacked rows) ── */
+  /* ── Row 4: News (3 stacked rows) ── */
   #news-panel {
     display: flex;
     flex-direction: column;
@@ -231,9 +229,10 @@
   .news-section {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     border-bottom: 1px solid var(--border);
-    padding: 10px 0;
+    padding: 6px 0;
+    flex: 1;
   }
   .news-section:last-child { border-bottom: none; }
   .news-section-title {
@@ -251,7 +250,7 @@
   .news-item { animation: fadeIn 0.4s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
   .news-headline {
-    font-size: clamp(20px, 2.5vw, 30px);
+    font-size: clamp(16px, 2.2vh, 22px);
     line-height: 1.4;
     color: var(--text);
     white-space: nowrap;
