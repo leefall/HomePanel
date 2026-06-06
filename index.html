@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Dashboard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0f;
+    --panel: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.1);
+    --text: #e8eaf6;
+    --muted: #90a4ae;
+    --accent: #64b5f6;
+    --warm: #ffb74d;
+    --green: #81c784;
+    --red: #e57373;
+    --radius: 16px;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+  }
+
+  /* ── Wallpaper background ── */
+  #wallpaper {
+    position: fixed; inset: 0; z-index: 0;
+    background-size: cover;
+    background-position: center;
+    transition: opacity 1.5s ease;
+  }
+  #wallpaper-next {
+    position: fixed; inset: 0; z-index: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.5s ease;
+  }
+  #overlay {
+    position: fixed; inset: 0; z-index: 1;
+    background: linear-gradient(
+      180deg,
+      rgba(0,0,0,0.55) 0%,
+      rgba(0,0,0,0.35) 40%,
+      rgba(0,0,0,0.55) 100%
+    );
+  }
+
+  /* ── Layout ── */
+  #app {
+    position: relative; z-index: 2;
+    width: 100%; height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr 340px;
+    gap: 14px;
+    padding: 18px 22px;
+  }
+
+  /* ── Glass panel ── */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    padding: 16px 20px;
+  }
+
+  /* ── Clock ── */
+  #clock-panel {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 24px;
+  }
+  #time {
+    font-size: clamp(52px, 7vw, 88px);
+    font-weight: 200;
+    letter-spacing: -2px;
+    color: #fff;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  #time-sep { animation: blink 1s step-start infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  #date-block { display: flex; flex-direction: column; gap: 2px; }
+  #date {
+    font-size: clamp(16px, 2vw, 22px);
+    color: var(--accent);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+  #weekday {
+    font-size: clamp(13px, 1.5vw, 17px);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  /* ── Weather panel (top-right) ── */
+  #weather-panel {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  #weather-current {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  #weather-icon { font-size: 52px; line-height: 1; }
+  #weather-temp {
+    font-size: clamp(36px, 4.5vw, 58px);
+    font-weight: 200;
+    color: #fff;
+    line-height: 1;
+  }
+  #weather-desc {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  #weather-feels {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  #weather-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    font-size: 13px;
+  }
+  .wd-item { color: var(--muted); }
+  .wd-item span { color: var(--text); font-weight: 500; }
+  #weather-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  #forecast {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow: hidden;
+    flex: 1;
+  }
+  .fc-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .fc-row:last-child { border-bottom: none; }
+  .fc-day { color: var(--muted); width: 32px; }
+  .fc-icon { font-size: 18px; }
+  .fc-hi { color: var(--warm); font-weight: 600; }
+  .fc-lo { color: var(--accent); margin-left: 4px; }
+  .fc-precip { display: flex; align-items: center; gap: 3px; }
+  .fc-precip-num { color: var(--accent); font-size: 12px; width: 28px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* ── News panel ── */
+  #news-panel {
+    grid-column: 1;
+    grid-row: 2 / 4;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow: hidden;
+  }
+  .news-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+  .news-section:last-child { border-bottom: none; padding-bottom: 0; }
+  .news-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+  .title-nyt    { color: #81c784; }
+  .title-yonhap { color: #ffb74d; }
+  .title-bbc    { color: #e57373; }
+  .news-section-list { overflow: hidden; flex: 1; }
+  .news-item {
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    animation: fadeIn 0.4s ease;
+  }
+  .news-item:last-child { border-bottom: none; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
+  .news-headline {
+    font-size: clamp(12px, 1.5vw, 15px);
+    line-height: 1.4;
+    color: var(--text);
+  }
+  .news-time {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* ── Exchange rate panel ── */
+  #fx-panel {
+    grid-column: 2;
+    grid-row: 3;
+    padding: 12px 16px;
+  }
+  #fx-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  #fx-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 10px;
+  }
+  .fx-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px;
+  }
+  .fx-pair {
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .fx-rate {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .fx-change {
+    font-size: 10px;
+    margin-top: 1px;
+  }
+  .fx-up { color: var(--green); }
+  .fx-down { color: var(--red); }
+  .fx-flat { color: var(--muted); }
+  #fx-updated {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 8px;
+    text-align: right;
+  }
+
+  /* ── Wallpaper credit ── */
+  #wp-credit {
+    position: fixed;
+    bottom: 8px; right: 12px;
+    z-index: 3;
+    font-size: 10px;
+    color: rgba(255,255,255,0.35);
+    pointer-events: none;
+  }
+
+  /* scrollbar hide */
+  ::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Wallpaper layers -->
+<div id="wallpaper"></div>
+<div id="wallpaper-next"></div>
+<div id="overlay"></div>
+
+<!-- Main layout -->
+<div id="app">
+
+  <!-- Clock (top-left) -->
+  <div class="panel" id="clock-panel">
+    <div id="time"><span id="th">00</span><span id="time-sep">:</span><span id="tm">00</span></div>
+    <div id="date-block">
+      <div id="date">Loading…</div>
+      <div id="weekday"></div>
+    </div>
+  </div>
+
+  <!-- Weather (right column, rows 1-2) -->
+  <div class="panel" id="weather-panel">
+    <div id="weather-current">
+      <div id="weather-icon">⏳</div>
+      <div>
+        <div id="weather-temp">--°</div>
+        <div id="weather-desc">Loading weather…</div>
+        <div id="weather-feels"></div>
+        <div id="weather-hilo" style="font-size:13px;margin-top:4px;"></div>
+      </div>
+    </div>
+    <div id="weather-details">
+      <div class="wd-item">💧 Humidity <span id="w-hum">--</span>%</div>
+      <div class="wd-item">💨 Wind <span id="w-wind">--</span> mph</div>
+      <div class="wd-item">👁 Visibility <span id="w-vis">--</span> mi</div>
+      <div class="wd-item">☁ Cloud <span id="w-cloud">--</span>%</div>
+    </div>
+    <div id="weather-section-title">7-Day Forecast</div>
+    <div id="forecast">
+      <div style="color:var(--muted);font-size:13px;">Loading…</div>
+    </div>
+  </div>
+
+  <!-- News (left, rows 2-3) -->
+  <div class="panel" id="news-panel">
+    <div class="news-section">
+      <div class="news-section-title title-nyt">NYT</div>
+      <div class="news-section-list" id="news-nyt"><span style="color:var(--muted);font-size:13px;">Loading…</span></div>
+    </div>
+    <div class="news-section">
+      <div class="news-section-title title-yonhap">Yonhap</div>
+      <div class="news-section-list" id="news-yonhap"><span style="color:var(--muted);font-size:13px;">Loading…</span></div>
+    </div>
+    <div class="news-section">
+      <div class="news-section-title title-bbc">BBC</div>
+      <div class="news-section-list" id="news-bbc"><span style="color:var(--muted);font-size:13px;">Loading…</span></div>
+    </div>
+  </div>
+
+  <!-- Exchange rates (bottom-right) -->
+  <div class="panel" id="fx-panel">
+    <div id="fx-title">💱 USD Exchange Rates</div>
+    <div id="fx-grid">
+      <div class="fx-row"><span class="fx-pair">USD → KRW</span><span class="fx-rate" id="fx-KRW">--</span></div>
+    </div>
+    <div id="fx-updated"></div>
+  </div>
+
+</div>
+
+<div id="wp-credit"></div>
+
+<script>
+// ════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════
+const CFG = {
+  lat: 40.7128, lon: -74.0060,   // New York City
+  weatherRefresh: 30 * 60 * 1000,
+  newsRefresh: 15 * 60 * 1000,
+  wallpaperInterval: 5 * 60 * 1000,  // change wallpaper every 5 min
+  rss2json: 'https://api.rss2json.com/v1/api.json?rss_url=',
+  newsFeeds: [
+    { id: 'bbc',    label: 'BBC',    badge: 'badge-bbc',    url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
+    { id: 'nyt',    label: 'NYT',    badge: 'badge-nyt',    url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml' },
+    { id: 'yonhap', label: 'Yonhap', badge: 'badge-yonhap', url: 'https://en.yna.co.kr/RSS/news.xml' },
+  ],
+};
+
+// Wallpaper sources — day (6:00~20:00) vs night (20:00~6:00)
+const WALLPAPERS_DAY = [
+  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80',  // mountain lake
+  'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1920&q=80',  // forest
+  'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1920&q=80',  // beach sunset
+  'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=1920&q=80',  // misty mountains
+  'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1920&q=80',  // forest path
+  'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=1920&q=80',  // wildflowers
+  'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80',  // beach turquoise
+  'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1920&q=80',  // city day
+  'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1920&q=80',  // sunny meadow
+  'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&q=80',  // bright nature
+];
+const WALLPAPERS_NIGHT = [
+  'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=80',  // city night
+  'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80',  // night sky stars
+  'https://images.unsplash.com/photo-1494524693376-f4fcc78a0c02?w=1920&q=80',  // aurora
+  'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1920&q=80',  // milky way
+  'https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?w=1920&q=80',  // night city lights
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&q=80',  // city skyline night
+  'https://images.unsplash.com/photo-1516912481808-3406841bd33c?w=1920&q=80',  // snowy night
+  'https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=1920&q=80',  // night forest
+];
+
+function getWallpaperPool() {
+  const h = new Date().getHours();
+  return (h >= 6 && h < 20) ? WALLPAPERS_DAY : WALLPAPERS_NIGHT;
+}
+
+// ════════════════════════════════════════
+// CLOCK
+// ════════════════════════════════════════
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('th').textContent = h;
+  document.getElementById('tm').textContent = m;
+  document.getElementById('date').textContent =
+    `${MONTHS[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+  document.getElementById('weekday').textContent = DAYS[now.getDay()];
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ════════════════════════════════════════
+// WEATHER  (Open-Meteo, free, no key)
+// ════════════════════════════════════════
+const WMO = {
+  0:'Clear',1:'Mainly Clear',2:'Partly Cloudy',3:'Overcast',
+  45:'Foggy',48:'Rime Fog',
+  51:'Light Drizzle',53:'Drizzle',55:'Heavy Drizzle',
+  61:'Light Rain',63:'Rain',65:'Heavy Rain',
+  71:'Light Snow',73:'Snow',75:'Heavy Snow',77:'Snow Grains',
+  80:'Light Showers',81:'Showers',82:'Heavy Showers',
+  85:'Snow Showers',86:'Heavy Snow Showers',
+  95:'Thunderstorm',96:'Thunderstorm+Hail',99:'Thunderstorm+Heavy Hail',
+};
+const WMO_ICON = {
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',
+  45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',
+  61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'🌨️',73:'❄️',75:'❄️',77:'🌨️',
+  80:'🌦️',81:'🌧️',82:'⛈️',
+  85:'🌨️',86:'❄️',
+  95:'⛈️',96:'⛈️',99:'⛈️',
+};
+
+function wmoIcon(code) { return WMO_ICON[code] || '🌡️'; }
+function wmoDesc(code) { return WMO[code] || 'Unknown'; }
+
+async function fetchWeather() {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${CFG.lat}&longitude=${CFG.lon}` +
+      `&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,` +
+      `cloud_cover,visibility,weathercode` +
+      `&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
+      `&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch` +
+      `&timezone=America%2FNew_York&forecast_days=7`;
+    const r = await fetch(url);
+    const d = await r.json();
+    const c = d.current;
+
+    const fc2 = f => Math.round((f - 32) * 5 / 9);
+    document.getElementById('weather-icon').textContent = wmoIcon(c.weathercode);
+    document.getElementById('weather-temp').textContent = `${Math.round(c.temperature_2m)}°F (${fc2(c.temperature_2m)}°C)`;
+    document.getElementById('weather-desc').textContent = wmoDesc(c.weathercode);
+    document.getElementById('weather-feels').textContent = `Feels like ${Math.round(c.apparent_temperature)}°F (${fc2(c.apparent_temperature)}°C)`;
+    const dd0 = d.daily;
+    document.getElementById('weather-hilo').innerHTML =
+      `<span style="color:var(--warm);font-weight:600;">↑${Math.round(dd0.temperature_2m_max[0])}°F (${fc2(dd0.temperature_2m_max[0])}°C)</span>` +
+      `<span style="color:var(--accent);margin-left:8px;">↓${Math.round(dd0.temperature_2m_min[0])}°F (${fc2(dd0.temperature_2m_min[0])}°C)</span>`;
+    document.getElementById('w-hum').textContent = c.relative_humidity_2m;
+    document.getElementById('w-wind').textContent = Math.round(c.wind_speed_10m);
+    document.getElementById('w-vis').textContent = c.visibility ? (c.visibility / 1609).toFixed(1) : '--';
+    document.getElementById('w-cloud').textContent = c.cloud_cover;
+
+    // Forecast
+    const fc = document.getElementById('forecast');
+    fc.innerHTML = '';
+    const dd = d.daily;
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(dd.time[i] + 'T12:00:00');
+      const day = DAYS[date.getDay()].slice(0,3);
+      const row = document.createElement('div');
+      row.className = 'fc-row';
+      row.innerHTML = `
+        <span class="fc-day">${day}</span>
+        <span class="fc-icon">${wmoIcon(dd.weathercode[i])}</span>
+        <span><span class="fc-hi">${Math.round(dd.temperature_2m_max[i])}°F (${fc2(dd.temperature_2m_max[i])}°C)</span><span class="fc-lo"> / ${Math.round(dd.temperature_2m_min[i])}°F (${fc2(dd.temperature_2m_min[i])}°C)</span></span>
+        <span class="fc-precip">💧<span class="fc-precip-num">${dd.precipitation_probability_max[i]}%</span></span>
+      `;
+      fc.appendChild(row);
+    }
+  } catch(e) {
+    document.getElementById('weather-desc').textContent = 'Weather unavailable';
+    console.error('Weather fetch failed', e);
+  }
+}
+
+// ════════════════════════════════════════
+// NEWS
+// ════════════════════════════════════════
+
+function relTime(dateStr) {
+  if (!dateStr) return '';
+  const diff = (Date.now() - new Date(dateStr)) / 60000;
+  if (diff < 1) return 'Just now';
+  if (diff < 60) return `${Math.round(diff)}m ago`;
+  if (diff < 1440) return `${Math.round(diff/60)}h ago`;
+  return `${Math.round(diff/1440)}d ago`;
+}
+
+async function fetchOneFeed(feed) {
+  try {
+    const r = await fetch(CFG.rss2json + encodeURIComponent(feed.url));
+    const d = await r.json();
+    if (d.status !== 'ok') return [];
+    return (d.items || []).map(it => ({
+      id: feed.id, label: feed.label, badge: feed.badge,
+      title: (it.title || '').replace(/&amp;/g,'&').replace(/&#39;/g,"'").replace(/&quot;/g,'"').trim(),
+      pubDate: it.pubDate,
+    })).filter(it => it.title);
+  } catch(e) { return []; }
+}
+
+let newsBySource = { bbc: [], nyt: [], yonhap: [] };
+
+async function fetchNews() {
+  for (const feed of CFG.newsFeeds) {
+    const items = await fetchOneFeed(feed);
+    newsBySource[feed.id] = items.slice(0, 8);
+    renderSection(feed.id);
+    await new Promise(r => setTimeout(r, 1000));
+  }
+}
+
+function renderSection(id) {
+  const el = document.getElementById('news-' + id);
+  if (!el) return;
+  const items = newsBySource[id];
+  if (!items.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;">No headlines.</div>'; return; }
+  el.innerHTML = items.map(n => `
+    <div class="news-item">
+      <div class="news-headline">${n.title}</div>
+      <div class="news-time">${relTime(n.pubDate)}</div>
+    </div>
+  `).join('');
+}
+
+function renderNews() {
+  ['nyt','yonhap','bbc'].forEach(renderSection);
+}
+
+// Auto-scroll each section every 10s
+let newsScrollInterval;
+function startNewsScroll() {
+  clearInterval(newsScrollInterval);
+  const lists = ['news-nyt','news-yonhap','news-bbc'];
+  let i = 0;
+  newsScrollInterval = setInterval(() => {
+    const el = document.getElementById(lists[i % lists.length]);
+    if (el) {
+      const max = el.scrollHeight - el.clientHeight;
+      if (el.scrollTop >= max - 10) el.scrollTo({ top: 0, behavior: 'smooth' });
+      else el.scrollBy({ top: 100, behavior: 'smooth' });
+    }
+    i++;
+  }, 10000);
+}
+
+// ════════════════════════════════════════
+// WALLPAPER
+// ════════════════════════════════════════
+let wpIndex = 0;
+const wpEl = document.getElementById('wallpaper');
+const wpNext = document.getElementById('wallpaper-next');
+
+// Preload image before swap
+function preloadImage(src) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = img.onerror = () => resolve();
+    img.src = src;
+  });
+}
+
+let currentPool = [];
+
+function shuffled(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+async function changeWallpaper() {
+  const pool = getWallpaperPool();
+  // 시간대가 바뀌었으면 풀 교체
+  if (pool !== currentPool) {
+    currentPool = pool;
+    wpIndex = 0;
+    currentPool = shuffled(pool);
+  } else {
+    wpIndex = (wpIndex + 1) % currentPool.length;
+  }
+  const next = currentPool[wpIndex];
+  await preloadImage(next);
+  wpNext.style.backgroundImage = `url('${next}')`;
+  wpNext.style.opacity = '1';
+  setTimeout(() => {
+    wpEl.style.backgroundImage = `url('${next}')`;
+    wpNext.style.opacity = '0';
+  }, 1600);
+}
+
+function initWallpaper() {
+  currentPool = shuffled(getWallpaperPool());
+  wpIndex = 0;
+  wpEl.style.backgroundImage = `url('${currentPool[0]}')`;
+  setInterval(changeWallpaper, CFG.wallpaperInterval);
+}
+
+
+// ════════════════════════════════════════
+// EXCHANGE RATES  (open.er-api.com, free, no key)
+// ════════════════════════════════════════
+const FX_PAIRS = [
+  { id: 'KRW', fmt: v => Math.round(v).toLocaleString() },
+  { id: 'EUR', fmt: v => v.toFixed(4) },
+  { id: 'JPY', fmt: v => v.toFixed(2) },
+  { id: 'GBP', fmt: v => v.toFixed(4) },
+  { id: 'CNY', fmt: v => v.toFixed(4) },
+  { id: 'CAD', fmt: v => v.toFixed(4) },
+];
+let prevFxRates = {};
+
+async function fetchFX() {
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/USD');
+    const d = await r.json();
+    if (d.result !== 'success') return;
+    FX_PAIRS.forEach(({ id, fmt }) => {
+      const rate = d.rates[id];
+      if (!rate) return;
+      const el = document.getElementById(`fx-${id}`);
+      if (!el) return;
+      el.textContent = fmt(rate);
+      if (prevFxRates[id] !== undefined) {
+        const diff = rate - prevFxRates[id];
+        el.className = 'fx-rate ' + (diff > 0 ? 'fx-up' : diff < 0 ? 'fx-down' : 'fx-flat');
+      }
+      prevFxRates[id] = rate;
+    });
+    const now = new Date();
+    document.getElementById('fx-updated').textContent =
+      `Updated ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  } catch(e) {
+    console.error('FX fetch failed', e);
+  }
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+(async function init() {
+  initWallpaper();
+
+  await Promise.all([fetchWeather(), fetchNews(), fetchFX()]);
+  startNewsScroll();
+
+  setInterval(fetchWeather, CFG.weatherRefresh);
+  setInterval(async () => { await fetchNews(); startNewsScroll(); }, CFG.newsRefresh);
+  setInterval(fetchFX, 60 * 60 * 1000); // 환율 1시간마다 갱신
+
+  // Update relative times every minute
+  setInterval(() => {
+    if (allNews.length) renderNews();
+  }, 60000);
+})();
+</script>
+</body>
+</html>
