@@ -52,15 +52,15 @@
     );
   }
 
-  /* ── Layout ── */
+  /* ── Layout: single column ── */
   #app {
     position: relative; z-index: 2;
     width: 100%; height: 100%;
     display: grid;
-    grid-template-rows: auto 1fr auto;
-    grid-template-columns: 1fr 340px;
-    gap: 14px;
-    padding: 18px 22px;
+    grid-template-rows: auto auto 1fr;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px 14px;
   }
 
   /* ── Glass panel ── */
@@ -70,205 +70,184 @@
     border-radius: var(--radius);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    padding: 16px 20px;
+    padding: 16px 22px;
+  }
+
+  /* ── Row 1: Clock + Weather + FX ── */
+  #top-row {
+    display: grid;
+    grid-template-columns: auto minmax(0,1fr) auto;
+    gap: 10px;
+    align-items: stretch;
   }
 
   /* ── Clock ── */
   #clock-panel {
-    grid-column: 1;
-    grid-row: 1;
     display: flex;
     align-items: center;
-    gap: 24px;
-    padding: 14px 24px;
+    gap: 20px;
+    padding: 14px 28px;
   }
   #time {
-    font-size: clamp(52px, 7vw, 88px);
+    font-size: clamp(64px, 8vw, 100px);
     font-weight: 200;
-    letter-spacing: -2px;
+    letter-spacing: -3px;
     color: #fff;
     line-height: 1;
     font-variant-numeric: tabular-nums;
   }
   #time-sep { animation: blink 1s step-start infinite; }
   @keyframes blink { 50% { opacity: 0; } }
-  #date-block { display: flex; flex-direction: column; gap: 2px; }
+  #date-block { display: flex; flex-direction: column; gap: 4px; }
   #date {
-    font-size: clamp(16px, 2vw, 22px);
+    font-size: clamp(20px, 2.2vw, 28px);
     color: var(--accent);
     font-weight: 300;
-    letter-spacing: 0.5px;
   }
   #weekday {
-    font-size: clamp(13px, 1.5vw, 17px);
+    font-size: clamp(14px, 1.6vw, 20px);
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 2px;
   }
 
-  /* ── Weather panel (top-right) ── */
+  /* ── Weather (top middle) ── */
   #weather-panel {
-    grid-column: 2;
-    grid-row: 1 / 3;
     display: flex;
-    flex-direction: column;
-    gap: 12px;
+    align-items: center;
+    gap: 28px;
+    padding: 14px 24px;
   }
   #weather-current {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
+    flex-shrink: 0;
   }
   #weather-icon { font-size: 52px; line-height: 1; }
   #weather-temp {
-    font-size: clamp(36px, 4.5vw, 58px);
+    font-size: clamp(36px, 4vw, 52px);
     font-weight: 200;
     color: #fff;
     line-height: 1;
   }
-  #weather-desc {
-    font-size: 14px;
-    color: var(--muted);
-    margin-top: 3px;
-  }
-  #weather-feels {
-    font-size: 13px;
-    color: var(--muted);
-  }
+  #weather-desc { font-size: 16px; color: var(--muted); margin-top: 3px; }
+  #weather-feels { font-size: 15px; color: var(--muted); }
+  #weather-hilo { font-size: 15px; margin-top: 4px; }
   #weather-details {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    font-size: 13px;
+    gap: 5px 16px;
+    font-size: 15px;
+    flex-shrink: 0;
+    min-width: 0;
   }
-  .wd-item { color: var(--muted); }
+  .wd-item { color: var(--muted); white-space: nowrap; }
   .wd-item span { color: var(--text); font-weight: 500; }
-  #weather-section-title {
-    font-size: 11px;
+
+  /* ── FX (top right) ── */
+  #fx-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 14px 22px;
+    min-width: 180px;
+  }
+  #fx-title {
+    font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: var(--muted);
-    margin-top: 4px;
+    margin-bottom: 6px;
+  }
+  .fx-pair { font-size: 15px; color: var(--muted); }
+  .fx-rate {
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .fx-up { color: var(--green); }
+  .fx-down { color: var(--red); }
+  #fx-updated { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ── Row 2: 7-day forecast ── */
+  #forecast-panel {
+    padding: 14px 22px;
+  }
+  #weather-section-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 10px;
   }
   #forecast {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     gap: 8px;
-    overflow: hidden;
-    flex: 1;
   }
   .fc-row {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 13px;
-    padding: 5px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .fc-row:last-child { border-bottom: none; }
-  .fc-day { color: var(--muted); width: 32px; }
-  .fc-icon { font-size: 18px; }
-  .fc-hi { color: var(--warm); font-weight: 600; }
-  .fc-lo { color: var(--accent); margin-left: 4px; }
-  .fc-precip { display: flex; align-items: center; gap: 3px; }
-  .fc-precip-num { color: var(--accent); font-size: 12px; width: 28px; text-align: right; font-variant-numeric: tabular-nums; }
-
-  /* ── News panel ── */
-  #news-panel {
-    grid-column: 1;
-    grid-row: 2 / 4;
-    display: flex;
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 4px;
+    border-right: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .fc-row:last-child { border-right: none; }
+  .fc-day { color: var(--muted); font-size: 13px; }
+  .fc-icon { font-size: 22px; }
+  .fc-hi { color: var(--warm); font-weight: 600; }
+  .fc-lo { color: var(--accent); }
+  .fc-precip { display: flex; align-items: center; gap: 2px; color: var(--accent); font-size: 13px; }
+  .fc-precip-num { font-variant-numeric: tabular-nums; }
+
+  /* ── Row 3: News ── */
+  #news-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
     overflow: hidden;
   }
   .news-section {
-    flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 8px;
+    border-right: 1px solid var(--border);
+    padding-right: 14px;
   }
-  .news-section:last-child { border-bottom: none; padding-bottom: 0; }
+  .news-section:last-child { border-right: none; padding-right: 0; }
   .news-section-title {
-    font-size: 11px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 2px;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     flex-shrink: 0;
   }
   .title-nyt    { color: #81c784; }
   .title-yonhap { color: #ffb74d; }
   .title-bbc    { color: #e57373; }
-  .news-section-list { overflow: hidden; flex: 1; }
+  .news-section-list { overflow: hidden; }
   .news-item {
-    padding: 7px 0;
+    padding: 10px 0;
     border-bottom: 1px solid var(--border);
     animation: fadeIn 0.4s ease;
   }
   .news-item:last-child { border-bottom: none; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
   .news-headline {
-    font-size: clamp(12px, 1.5vw, 15px);
-    line-height: 1.4;
+    font-size: clamp(15px, 1.7vw, 19px);
+    line-height: 1.45;
     color: var(--text);
   }
   .news-time {
-    font-size: 11px;
+    font-size: 13px;
     color: var(--muted);
-    margin-top: 2px;
-  }
-
-  /* ── Exchange rate panel ── */
-  #fx-panel {
-    grid-column: 2;
-    grid-row: 3;
-    padding: 12px 16px;
-  }
-  #fx-title {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-  #fx-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px 10px;
-  }
-  .fx-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 6px;
-  }
-  .fx-pair {
-    font-size: 12px;
-    color: var(--muted);
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-  }
-  .fx-rate {
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-  }
-  .fx-change {
-    font-size: 10px;
-    margin-top: 1px;
-  }
-  .fx-up { color: var(--green); }
-  .fx-down { color: var(--red); }
-  .fx-flat { color: var(--muted); }
-  #fx-updated {
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 8px;
-    text-align: right;
+    margin-top: 3px;
   }
 
   /* ── Wallpaper credit ── */
@@ -295,61 +274,59 @@
 <!-- Main layout -->
 <div id="app">
 
-  <!-- Clock (top-left) -->
-  <div class="panel" id="clock-panel">
-    <div id="time"><span id="th">00</span><span id="time-sep">:</span><span id="tm">00</span></div>
-    <div id="date-block">
-      <div id="date">Loading…</div>
-      <div id="weekday"></div>
-    </div>
-  </div>
-
-  <!-- Weather (right column, rows 1-2) -->
-  <div class="panel" id="weather-panel">
-    <div id="weather-current">
-      <div id="weather-icon">⏳</div>
-      <div>
-        <div id="weather-temp">--°</div>
-        <div id="weather-desc">Loading weather…</div>
-        <div id="weather-feels"></div>
-        <div id="weather-hilo" style="font-size:13px;margin-top:4px;"></div>
+  <!-- Row 1: Clock + Weather + FX -->
+  <div id="top-row">
+    <div class="panel" id="clock-panel">
+      <div id="time"><span id="th">00</span><span id="time-sep">:</span><span id="tm">00</span></div>
+      <div id="date-block">
+        <div id="date">Loading…</div>
+        <div id="weekday"></div>
       </div>
     </div>
-    <div id="weather-details">
-      <div class="wd-item">💧 Humidity <span id="w-hum">--</span>%</div>
-      <div class="wd-item">💨 Wind <span id="w-wind">--</span> mph</div>
-      <div class="wd-item">👁 Visibility <span id="w-vis">--</span> mi</div>
-      <div class="wd-item">☁ Cloud <span id="w-cloud">--</span>%</div>
+    <div class="panel" id="weather-panel">
+      <div id="weather-current">
+        <div id="weather-icon">⏳</div>
+        <div>
+          <div id="weather-temp">--°</div>
+          <div id="weather-desc">Loading weather…</div>
+          <div id="weather-feels"></div>
+          <div id="weather-hilo"></div>
+        </div>
+      </div>
+      <div id="weather-details">
+        <div class="wd-item">💧 Humidity <span id="w-hum">--</span>%</div>
+        <div class="wd-item">💨 Wind <span id="w-wind">--</span> mph</div>
+        <div class="wd-item">👁 Visibility <span id="w-vis">--</span> mi</div>
+        <div class="wd-item">☁ Cloud <span id="w-cloud">--</span>%</div>
+      </div>
     </div>
-    <div id="weather-section-title">7-Day Forecast</div>
-    <div id="forecast">
-      <div style="color:var(--muted);font-size:13px;">Loading…</div>
+    <div class="panel" id="fx-panel">
+      <div id="fx-title">USD → KRW</div>
+      <div class="fx-rate" id="fx-KRW">--</div>
+      <div id="fx-updated"></div>
     </div>
   </div>
 
-  <!-- News (left, rows 2-3) -->
+  <!-- Row 2: 7-day forecast -->
+  <div class="panel" id="forecast-panel">
+    <div id="weather-section-title">7-Day Forecast</div>
+    <div id="forecast"><div style="color:var(--muted);font-size:14px;">Loading…</div></div>
+  </div>
+
+  <!-- Row 3: News 3-column -->
   <div class="panel" id="news-panel">
     <div class="news-section">
       <div class="news-section-title title-nyt">NYT</div>
-      <div class="news-section-list" id="news-nyt"><span style="color:var(--muted);font-size:13px;">Loading…</span></div>
+      <div class="news-section-list" id="news-nyt"><span style="color:var(--muted);">Loading…</span></div>
     </div>
     <div class="news-section">
       <div class="news-section-title title-yonhap">Yonhap</div>
-      <div class="news-section-list" id="news-yonhap"><span style="color:var(--muted);font-size:13px;">Loading…</span></div>
+      <div class="news-section-list" id="news-yonhap"><span style="color:var(--muted);">Loading…</span></div>
     </div>
     <div class="news-section">
       <div class="news-section-title title-bbc">BBC</div>
-      <div class="news-section-list" id="news-bbc"><span style="color:var(--muted);font-size:13px;">Loading…</span></div>
+      <div class="news-section-list" id="news-bbc"><span style="color:var(--muted);">Loading…</span></div>
     </div>
-  </div>
-
-  <!-- Exchange rates (bottom-right) -->
-  <div class="panel" id="fx-panel">
-    <div id="fx-title">💱 USD Exchange Rates</div>
-    <div id="fx-grid">
-      <div class="fx-row"><span class="fx-pair">USD → KRW</span><span class="fx-rate" id="fx-KRW">--</span></div>
-    </div>
-    <div id="fx-updated"></div>
   </div>
 
 </div>
@@ -489,7 +466,8 @@ async function fetchWeather() {
       row.innerHTML = `
         <span class="fc-day">${day}</span>
         <span class="fc-icon">${wmoIcon(dd.weathercode[i])}</span>
-        <span><span class="fc-hi">${Math.round(dd.temperature_2m_max[i])}°F (${fc2(dd.temperature_2m_max[i])}°C)</span><span class="fc-lo"> / ${Math.round(dd.temperature_2m_min[i])}°F (${fc2(dd.temperature_2m_min[i])}°C)</span></span>
+        <span class="fc-hi">${Math.round(dd.temperature_2m_max[i])}°<span style="font-size:11px;font-weight:400;opacity:0.7"> (${fc2(dd.temperature_2m_max[i])}°)</span></span>
+        <span class="fc-lo">${Math.round(dd.temperature_2m_min[i])}°<span style="font-size:11px;opacity:0.7"> (${fc2(dd.temperature_2m_min[i])}°)</span></span>
         <span class="fc-precip">💧<span class="fc-precip-num">${dd.precipitation_probability_max[i]}%</span></span>
       `;
       fc.appendChild(row);
@@ -531,7 +509,7 @@ let newsBySource = { bbc: [], nyt: [], yonhap: [] };
 async function fetchNews() {
   for (const feed of CFG.newsFeeds) {
     const items = await fetchOneFeed(feed);
-    newsBySource[feed.id] = items.slice(0, 8);
+    newsBySource[feed.id] = items.slice(0, 2);
     renderSection(feed.id);
     await new Promise(r => setTimeout(r, 1000));
   }
