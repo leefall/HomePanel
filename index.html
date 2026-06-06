@@ -57,7 +57,7 @@
     position: relative; z-index: 2;
     width: 100%; height: 100%;
     display: grid;
-    grid-template-rows: 23vh 13vh 20vh 1fr;
+    grid-template-rows: 30vh 12vh 20vh 1fr;
     grid-template-columns: 1fr;
     gap: 8px;
     padding: 10px 14px;
@@ -333,10 +333,6 @@
       <div class="news-section-title title-yonhap">Yonhap</div>
       <div class="news-section-list" id="news-yonhap"><span style="color:var(--muted);">Loading…</span></div>
     </div>
-    <div class="news-section">
-      <div class="news-section-title title-bbc">BBC</div>
-      <div class="news-section-list" id="news-bbc"><span style="color:var(--muted);">Loading…</span></div>
-    </div>
     <div class="news-section" style="border-bottom:none;">
       <div class="news-section-title" style="color:var(--accent);">USD→KRW</div>
       <div style="font-size:clamp(22px,3vw,36px);font-weight:300;color:#fff;font-variant-numeric:tabular-nums;" id="fx-KRW">--</div>
@@ -358,7 +354,6 @@ const CFG = {
   wallpaperInterval: 5 * 60 * 1000,  // change wallpaper every 5 min
   rss2json: 'https://api.rss2json.com/v1/api.json?rss_url=',
   newsFeeds: [
-    { id: 'bbc',    label: 'BBC',    badge: 'badge-bbc',    url: 'https://feeds.bbci.co.uk/news/world/rss.xml' },
     { id: 'nyt',    label: 'NYT',    badge: 'badge-nyt',    url: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml' },
     { id: 'yonhap', label: 'Yonhap', badge: 'badge-yonhap', url: 'https://en.yna.co.kr/RSS/news.xml' },
   ],
