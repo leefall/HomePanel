@@ -57,7 +57,7 @@
     position: relative; z-index: 2;
     width: 100%; height: 100%;
     display: grid;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto auto auto;
     grid-template-columns: 1fr;
     gap: 8px;
     padding: 10px 12px;
@@ -73,10 +73,10 @@
     padding: 16px 22px;
   }
 
-  /* ── Row 1: Clock + Weather + FX ── */
+  /* ── Row 1: Clock + Weather ── */
   #top-row {
     display: grid;
-    grid-template-columns: auto minmax(0,1fr) auto;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
     align-items: stretch;
   }
@@ -84,95 +84,111 @@
   /* ── Clock ── */
   #clock-panel {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 20px;
-    padding: 14px 28px;
+    justify-content: center;
+    gap: 2px;
+    padding: 12px 20px;
+  }
+  #date {
+    font-size: clamp(38px, 5vw, 60px);
+    color: var(--accent);
+    font-weight: 300;
+    letter-spacing: 0.5px;
   }
   #time {
-    font-size: clamp(64px, 8vw, 100px);
+    font-size: clamp(80px, 12vw, 140px);
     font-weight: 200;
-    letter-spacing: -3px;
+    letter-spacing: -4px;
     color: #fff;
     line-height: 1;
     font-variant-numeric: tabular-nums;
   }
   #time-sep { animation: blink 1s step-start infinite; }
   @keyframes blink { 50% { opacity: 0; } }
-  #date-block { display: flex; flex-direction: column; gap: 4px; }
-  #date {
-    font-size: clamp(20px, 2.2vw, 28px);
-    color: var(--accent);
-    font-weight: 300;
-  }
   #weekday {
-    font-size: clamp(14px, 1.6vw, 20px);
+    font-size: clamp(32px, 4.2vw, 52px);
     color: var(--muted);
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
   }
 
-  /* ── Weather (top middle) ── */
+  /* ── Weather ── */
   #weather-panel {
     display: flex;
-    align-items: center;
-    gap: 28px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
     padding: 14px 24px;
+    overflow: hidden;
   }
   #weather-current {
     display: flex;
     align-items: center;
     gap: 14px;
-    flex-shrink: 0;
   }
-  #weather-icon { font-size: 52px; line-height: 1; }
+  #weather-icon { font-size: 64px; line-height: 1; flex-shrink: 0; }
   #weather-temp {
-    font-size: clamp(36px, 4vw, 52px);
+    font-size: clamp(56px, 7vw, 88px);
     font-weight: 200;
     color: #fff;
     line-height: 1;
   }
-  #weather-desc { font-size: 16px; color: var(--muted); margin-top: 3px; }
-  #weather-feels { font-size: 15px; color: var(--muted); }
-  #weather-hilo { font-size: 15px; margin-top: 4px; }
+  #weather-desc { font-size: 22px; color: var(--muted); margin-top: 4px; }
+  #weather-feels { font-size: 20px; color: var(--muted); }
+  #weather-hilo { font-size: 22px; margin-top: 4px; }
   #weather-details {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px 16px;
-    font-size: 15px;
-    flex-shrink: 0;
-    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    font-size: 18px;
   }
   .wd-item { color: var(--muted); white-space: nowrap; }
   .wd-item span { color: var(--text); font-weight: 500; }
 
-  /* ── FX (top right) ── */
-  #fx-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 14px 22px;
-    min-width: 180px;
-  }
-  #fx-title {
+  .fx-up { color: var(--green); }
+  .fx-down { color: var(--red); }
+
+  /* ── Row 2: Hourly precip chart ── */
+  #precip-panel { padding: 10px 22px 12px; }
+  #precip-title {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 2px;
     color: var(--muted);
     margin-bottom: 6px;
   }
-  .fx-pair { font-size: 15px; color: var(--muted); }
-  .fx-rate {
-    font-size: 28px;
-    font-weight: 300;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-    line-height: 1.1;
+  #precip-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 72px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding-bottom: 4px;
+    position: relative;
   }
-  .fx-up { color: var(--green); }
-  .fx-down { color: var(--red); }
-  #fx-updated { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .precip-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    gap: 2px;
+  }
+  .precip-bar {
+    width: 100%;
+    border-radius: 2px 2px 0 0;
+    min-height: 4px;
+  }
+  .precip-label {
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    white-space: nowrap;
+    line-height: 1;
+  }
 
-  /* ── Row 2: 7-day forecast ── */
+  /* ── Row 3: 7-day forecast ── */
   #forecast-panel {
     padding: 14px 22px;
   }
@@ -198,11 +214,11 @@
     font-size: 16px;
   }
   .fc-row:last-child { border-right: none; }
-  .fc-day { color: var(--muted); font-size: 15px; font-weight: 600; }
-  .fc-icon { font-size: 28px; }
-  .fc-hi { color: var(--warm); font-weight: 600; font-size: 16px; }
-  .fc-lo { color: var(--accent); font-size: 15px; }
-  .fc-precip { display: flex; align-items: center; gap: 2px; color: var(--accent); font-size: 14px; }
+  .fc-day { color: var(--muted); font-size: 18px; font-weight: 600; }
+  .fc-icon { font-size: 32px; }
+  .fc-hi { color: var(--warm); font-weight: 600; font-size: 18px; }
+  .fc-lo { color: var(--accent); font-size: 17px; }
+  .fc-precip { display: flex; align-items: center; gap: 2px; color: var(--accent); font-size: 16px; }
   .fc-precip-num { font-variant-numeric: tabular-nums; }
 
   /* ── Row 3: News (3 stacked rows) ── */
@@ -221,12 +237,12 @@
   }
   .news-section:last-child { border-bottom: none; }
   .news-section-title {
-    font-size: 13px;
+    font-size: 16px;
     text-transform: uppercase;
     letter-spacing: 2px;
     font-weight: 700;
     flex-shrink: 0;
-    width: 70px;
+    width: 90px;
   }
   .title-nyt    { color: #81c784; }
   .title-yonhap { color: #ffb74d; }
@@ -235,7 +251,7 @@
   .news-item { animation: fadeIn 0.4s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
   .news-headline {
-    font-size: clamp(18px, 2.2vw, 26px);
+    font-size: clamp(20px, 2.5vw, 30px);
     line-height: 1.4;
     color: var(--text);
     white-space: nowrap;
@@ -243,7 +259,7 @@
     text-overflow: ellipsis;
   }
   .news-time {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--muted);
     margin-top: 3px;
   }
@@ -275,11 +291,9 @@
   <!-- Row 1: Clock + Weather + FX -->
   <div id="top-row">
     <div class="panel" id="clock-panel">
+      <div id="date">Loading…</div>
       <div id="time"><span id="th">00</span><span id="time-sep">:</span><span id="tm">00</span></div>
-      <div id="date-block">
-        <div id="date">Loading…</div>
-        <div id="weekday"></div>
-      </div>
+      <div id="weekday"></div>
     </div>
     <div class="panel" id="weather-panel">
       <div id="weather-current">
@@ -298,20 +312,21 @@
         <div class="wd-item">☁ Cloud <span id="w-cloud">--</span>%</div>
       </div>
     </div>
-    <div class="panel" id="fx-panel">
-      <div id="fx-title">USD → KRW</div>
-      <div class="fx-rate" id="fx-KRW">--</div>
-      <div id="fx-updated"></div>
-    </div>
   </div>
 
-  <!-- Row 2: 7-day forecast -->
+  <!-- Row 2: 24h precip chart -->
+  <div class="panel" id="precip-panel">
+    <div id="precip-title">24-Hour Precipitation Probability</div>
+    <div id="precip-chart"></div>
+  </div>
+
+  <!-- Row 3: 7-day forecast -->
   <div class="panel" id="forecast-panel">
     <div id="weather-section-title">7-Day Forecast</div>
     <div id="forecast"><div style="color:var(--muted);font-size:14px;">Loading…</div></div>
   </div>
 
-  <!-- Row 3: News 3-column -->
+  <!-- Row 3: News + FX -->
   <div class="panel" id="news-panel">
     <div class="news-section">
       <div class="news-section-title title-nyt">NYT</div>
@@ -324,6 +339,10 @@
     <div class="news-section">
       <div class="news-section-title title-bbc">BBC</div>
       <div class="news-section-list" id="news-bbc"><span style="color:var(--muted);">Loading…</span></div>
+    </div>
+    <div class="news-section" style="border-bottom:none;">
+      <div class="news-section-title" style="color:var(--accent);">USD→KRW</div>
+      <div style="font-size:clamp(22px,3vw,36px);font-weight:300;color:#fff;font-variant-numeric:tabular-nums;" id="fx-KRW">--</div>
     </div>
   </div>
 
@@ -426,11 +445,33 @@ const WMO_ICON = {
 function wmoIcon(code) { return WMO_ICON[code] || '🌡️'; }
 function wmoDesc(code) { return WMO[code] || 'Unknown'; }
 
+function drawPrecipChart(probs, startHour) {
+  const chart = document.getElementById('precip-chart');
+  if (!chart) return;
+  const maxP = Math.max(...probs, 10); // 최소 스케일 10%
+  chart.innerHTML = probs.map((p, i) => {
+    const h = (startHour + i) % 24;
+    const showLabel = i % 6 === 0 || i === 23;
+    const label = showLabel
+      ? (h === 0 ? '12a' : h === 12 ? '12p' : h < 12 ? h + 'a' : (h - 12) + 'p')
+      : '';
+    const alpha = 0.25 + (p / 100) * 0.75;
+    const heightPct = Math.max((p / maxP) * 100, 6);
+    const showVal = p >= 20;
+    return `<div class="precip-bar-wrap">
+      ${showVal ? `<div style="font-size:9px;color:rgba(100,181,246,0.9);margin-bottom:1px;">${p}%</div>` : ''}
+      <div class="precip-bar" style="height:${heightPct}%;background:rgba(100,181,246,${alpha.toFixed(2)});"></div>
+      <div class="precip-label">${label}</div>
+    </div>`;
+  }).join('');
+}
+
 async function fetchWeather() {
   try {
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${CFG.lat}&longitude=${CFG.lon}` +
       `&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,` +
       `cloud_cover,visibility,weathercode` +
+      `&hourly=precipitation_probability` +
       `&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max` +
       `&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch` +
       `&timezone=America%2FNew_York&forecast_days=7`;
@@ -451,6 +492,12 @@ async function fetchWeather() {
     document.getElementById('w-wind').textContent = Math.round(c.wind_speed_10m);
     document.getElementById('w-vis').textContent = c.visibility ? (c.visibility / 1609).toFixed(1) : '--';
     document.getElementById('w-cloud').textContent = c.cloud_cover;
+
+    // 24h precip chart
+    const now = new Date();
+    const currentHour = now.getHours();
+    const precipProbs = d.hourly.precipitation_probability.slice(currentHour, currentHour + 24);
+    drawPrecipChart(precipProbs, currentHour);
 
     // Forecast
     const fc = document.getElementById('forecast');
@@ -633,8 +680,6 @@ async function fetchFX() {
       prevFxRates[id] = rate;
     });
     const now = new Date();
-    document.getElementById('fx-updated').textContent =
-      `Updated ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   } catch(e) {
     console.error('FX fetch failed', e);
   }
