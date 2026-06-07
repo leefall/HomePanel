@@ -562,10 +562,10 @@ async function fetchWeather() {
 
     const fc2 = f => Math.round((f - 32) * 5 / 9);
     document.getElementById('weather-icon').textContent = wmoIcon(c.weathercode);
-    const sm2 = 'font-size:0.7em;opacity:0.8;vertical-align:middle;';
-    document.getElementById('weather-temp').innerHTML = `${Math.round(c.temperature_2m)}°F <span style="${sm2}">(${fc2(c.temperature_2m)}°C)</span>`;
+    const sm2 = 'display:block;font-size:0.6em;opacity:0.8;line-height:1.1;';
+    document.getElementById('weather-temp').innerHTML = `${Math.round(c.temperature_2m)}°F<span style="${sm2}">(${fc2(c.temperature_2m)}°C)</span>`;
     document.getElementById('weather-desc').textContent = wmoDesc(c.weathercode);
-    document.getElementById('weather-feels').innerHTML = `Feels like ${Math.round(c.apparent_temperature)}°F <span style="${sm2}">(${fc2(c.apparent_temperature)}°C)</span>`;
+    document.getElementById('weather-feels').innerHTML = `Feels like ${Math.round(c.apparent_temperature)}°F <span style="font-size:0.85em;opacity:0.8;">(${fc2(c.apparent_temperature)}°C)</span>`;
     const dd0 = d.daily;
     const sm = 'font-size:0.78em;opacity:0.8;';
     document.getElementById('weather-hi').innerHTML =
