@@ -411,6 +411,7 @@
         <div class="market-item">
           <div class="market-label">USD→KRW</div>
           <div class="market-value" id="fx-KRW">--</div>
+          <div class="market-change" id="fx-KRW-chg"></div>
         </div>
         <div class="market-stack">
           <div class="market-item">
@@ -745,15 +746,30 @@ function setMarketChange(elId, pct) {
 
 async function fetchFX() {
   try {
-    const r = await fetch('https://open.er-api.com/v6/latest/USD');
-    const d = await r.json();
-    if (d.result !== 'success') return;
-    const rate = d.rates['KRW'];
-    if (rate) {
-      const el = document.getElementById('fx-KRW');
-      if (el) el.textContent = Math.round(rate).toLocaleString();
-    }
-  } catch(e) { console.error('FX fetch failed', e); }
+    // 환율 현재값 + 전날 등락률 (Yahoo Finance)
+    const yhUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/USDKRW%3DX?interval=1d&range=2d';
+    const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(yhUrl);
+    const r = await fetch(proxy);
+    const outer = await r.json();
+    const d = JSON.parse(outer.contents);
+    const meta = d.chart.result[0].meta;
+    const rate = meta.regularMarketPrice;
+    const prev = meta.chartPreviousClose;
+    const pct  = ((rate - prev) / prev) * 100;
+    const el = document.getElementById('fx-KRW');
+    if (el) el.textContent = Math.round(rate).toLocaleString();
+    setMarketChange('fx-KRW-chg', pct);
+  } catch(e) {
+    // fallback: open.er-api
+    try {
+      const r2 = await fetch('https://open.er-api.com/v6/latest/USD');
+      const d2 = await r2.json();
+      if (d2.result === 'success') {
+        const el = document.getElementById('fx-KRW');
+        if (el) el.textContent = Math.round(d2.rates['KRW']).toLocaleString();
+      }
+    } catch(e2) { console.error('FX fetch failed', e2); }
+  }
 }
 
 async function fetchMarket(symbol, valueId, changeId) {
