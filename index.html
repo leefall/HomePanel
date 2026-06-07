@@ -122,12 +122,36 @@
     overflow: hidden;
     min-width: 0;
   }
-  #weather-current {
+  #weather-main {
     display: flex;
-    align-items: center;
-    gap: 14px;
+    align-items: stretch;
+    gap: 18px;
   }
-  #weather-icon { font-size: clamp(44px, 7vh, 60px); line-height: 1; flex-shrink: 0; }
+  /* Left: icon + hi/lo below */
+  #weather-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 6px;
+  }
+  #weather-icon { font-size: clamp(44px, 7vh, 64px); line-height: 1; }
+  #weather-hilo {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  #weather-hi { color: var(--warm); font-size: clamp(14px, 2.2vh, 20px); font-weight: 600; line-height: 1.3; }
+  #weather-lo { color: var(--accent); font-size: clamp(14px, 2.2vh, 20px); line-height: 1.3; }
+  /* Right: temp + desc + feels */
+  #weather-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+  }
   #weather-temp {
     font-size: clamp(44px, 8vh, 70px);
     font-weight: 200;
@@ -136,7 +160,6 @@
   }
   #weather-desc { font-size: clamp(16px, 2.8vh, 24px); color: var(--muted); }
   #weather-feels { font-size: clamp(15px, 2.4vh, 21px); color: var(--muted); }
-  #weather-hilo { font-size: clamp(15px, 2.4vh, 21px); }
   #weather-details {
     display: flex;
     flex-wrap: wrap;
@@ -152,9 +175,10 @@
   /* ── Market row ── */
   .market-grid {
     display: flex;
-    gap: 32px;
     align-items: center;
     flex: 1;
+    justify-content: space-between;
+    padding-right: 8px;
   }
   .market-item { display: flex; align-items: baseline; gap: 10px; }
   .market-label {
@@ -322,13 +346,18 @@
       <div id="weekday"></div>
     </div>
     <div class="panel" id="weather-panel">
-      <div id="weather-current">
-        <div id="weather-icon">⏳</div>
-        <div>
+      <div id="weather-main">
+        <div id="weather-left">
+          <div id="weather-icon">⏳</div>
+          <div id="weather-hilo">
+            <div id="weather-hi"></div>
+            <div id="weather-lo"></div>
+          </div>
+        </div>
+        <div id="weather-right">
           <div id="weather-temp">--°</div>
           <div id="weather-desc">Loading weather…</div>
           <div id="weather-feels"></div>
-          <div id="weather-hilo"></div>
         </div>
       </div>
       <div id="weather-details">
@@ -521,9 +550,10 @@ async function fetchWeather() {
     document.getElementById('weather-desc').textContent = wmoDesc(c.weathercode);
     document.getElementById('weather-feels').textContent = `Feels like ${Math.round(c.apparent_temperature)}°F (${fc2(c.apparent_temperature)}°C)`;
     const dd0 = d.daily;
-    document.getElementById('weather-hilo').innerHTML =
-      `<div style="color:var(--warm);font-weight:600;">↑${Math.round(dd0.temperature_2m_max[0])}°F (${fc2(dd0.temperature_2m_max[0])}°C)</div>` +
-      `<div style="color:var(--accent);">↓${Math.round(dd0.temperature_2m_min[0])}°F (${fc2(dd0.temperature_2m_min[0])}°C)</div>`;
+    document.getElementById('weather-hi').innerHTML =
+      `↑${Math.round(dd0.temperature_2m_max[0])}°F<br>(${fc2(dd0.temperature_2m_max[0])}°C)`;
+    document.getElementById('weather-lo').innerHTML =
+      `↓${Math.round(dd0.temperature_2m_min[0])}°F<br>(${fc2(dd0.temperature_2m_min[0])}°C)`;
     document.getElementById('w-hum').textContent = c.relative_humidity_2m;
     document.getElementById('w-wind').textContent = Math.round(c.wind_speed_10m);
     document.getElementById('w-vis').textContent = c.visibility ? (c.visibility / 1609).toFixed(1) : '--';
