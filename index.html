@@ -155,20 +155,24 @@
   #weather-feels { font-size: clamp(13px, 2vh, 18px); color: var(--muted); white-space: nowrap; }
   #weather-details {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 16px;
   }
   #weather-hilo {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 4px;
     flex-shrink: 0;
-    margin-right: 4px;
   }
   #weather-hi { color: var(--warm); font-size: clamp(13px, 2vh, 18px); font-weight: 600; white-space: nowrap; }
   #weather-lo { color: var(--accent); font-size: clamp(13px, 2vh, 18px); white-space: nowrap; }
-  .wd-item { color: var(--text); font-size: clamp(15px, 2.2vh, 20px); white-space: nowrap; }
-  .wd-item span { font-weight: 600; }
+  #weather-icons {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .wd-item { color: var(--muted); font-size: clamp(11px, 1.4vh, 14px); white-space: nowrap; }
+  .wd-item span { color: var(--text); font-weight: 500; }
 
   .fx-up { color: var(--green); }
   .fx-down { color: var(--red); }
@@ -370,10 +374,12 @@
           <div id="weather-hi"></div>
           <div id="weather-lo"></div>
         </div>
-        <div class="wd-item">💧 <span id="w-hum">--</span>%</div>
-        <div class="wd-item">💨 <span id="w-wind">--</span> mph</div>
-        <div class="wd-item">👁 <span id="w-vis">--</span> mi</div>
-        <div class="wd-item">☁️ <span id="w-cloud">--</span>%</div>
+        <div id="weather-icons">
+          <div class="wd-item">💧 <span id="w-hum">--</span>%</div>
+          <div class="wd-item">💨 <span id="w-wind">--</span> mph</div>
+          <div class="wd-item">👁 <span id="w-vis">--</span> mi</div>
+          <div class="wd-item">☁️ <span id="w-cloud">--</span>%</div>
+        </div>
       </div>
     </div>
   </div>
