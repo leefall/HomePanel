@@ -152,21 +152,23 @@
     justify-content: center;
     gap: 3px;
     min-width: 0;
+    overflow: hidden;
   }
   #weather-temp {
-    font-size: clamp(44px, 8vh, 70px);
+    font-size: clamp(36px, 5.5vh, 56px);
     font-weight: 200;
     color: #fff;
-    line-height: 1;
+    line-height: 1.1;
+    white-space: nowrap;
   }
-  #weather-desc { font-size: clamp(16px, 2.8vh, 24px); color: var(--muted); }
-  #weather-feels { font-size: clamp(15px, 2.4vh, 21px); color: var(--muted); }
+  #weather-desc { font-size: clamp(14px, 2.2vh, 20px); color: var(--muted); }
+  #weather-feels { font-size: clamp(13px, 2vh, 18px); color: var(--muted); white-space: nowrap; }
   #weather-details {
     display: grid;
     grid-template-columns: 1fr 1fr;
     justify-items: end;
-    gap: 3px 20px;
-    font-size: clamp(14px, 2.2vh, 19px);
+    gap: 3px 12px;
+    font-size: clamp(13px, 1.9vh, 17px);
   }
   .wd-item { color: var(--muted); white-space: nowrap; }
   .wd-item span { color: var(--text); font-weight: 500; }
@@ -180,25 +182,27 @@
     align-items: center;
     flex: 1;
     justify-content: space-between;
-    padding-right: 8px;
+    min-width: 0;
+    overflow: hidden;
   }
-  .market-item { display: flex; align-items: baseline; gap: 10px; }
+  .market-item { display: flex; align-items: baseline; gap: 6px; flex-shrink: 1; min-width: 0; }
   .market-label {
-    font-size: clamp(14px, 1.9vh, 20px);
-    color: var(--accent);
+    font-size: clamp(12px, 1.6vh, 17px);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
     white-space: nowrap;
+    flex-shrink: 0;
   }
   .market-value {
-    font-size: clamp(18px, 3vh, 30px);
+    font-size: clamp(16px, 2.4vh, 26px);
     font-weight: 300;
     color: #fff;
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
   .market-change {
-    font-size: clamp(13px, 1.8vh, 18px);
+    font-size: clamp(11px, 1.5vh, 15px);
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
