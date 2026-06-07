@@ -802,11 +802,11 @@ async function fetchMarket(symbol, valueId, changeId) {
 }
 
 async function fetchAllMarkets() {
-  await Promise.all([
-    fetchFX(),
-    fetchMarket('^GSPC', 'mkt-sp500', 'mkt-sp500-chg'),
-    fetchMarket('^KS11', 'mkt-kospi',  'mkt-kospi-chg'),
-  ]);
+  await fetchFX();
+  await new Promise(r => setTimeout(r, 800));
+  await fetchMarket('^GSPC', 'mkt-sp500', 'mkt-sp500-chg');
+  await new Promise(r => setTimeout(r, 800));
+  await fetchMarket('^KS11', 'mkt-kospi', 'mkt-kospi-chg');
 }
 
 // ════════════════════════════════════════
