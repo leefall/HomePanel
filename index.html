@@ -149,6 +149,36 @@
   .fx-up { color: var(--green); }
   .fx-down { color: var(--red); }
 
+  /* ── Market row ── */
+  .market-grid {
+    display: flex;
+    gap: 32px;
+    align-items: center;
+    flex: 1;
+  }
+  .market-item { display: flex; align-items: baseline; gap: 10px; }
+  .market-label {
+    font-size: clamp(14px, 1.9vh, 20px);
+    color: var(--accent);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .market-value {
+    font-size: clamp(18px, 3vh, 30px);
+    font-weight: 300;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+  .market-change {
+    font-size: clamp(13px, 1.8vh, 18px);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .market-change.up { color: var(--green); }
+  .market-change.down { color: var(--red); }
+
   /* ── Row 2: Hourly precip chart ── */
   #precip-panel { padding: 6px 18px 8px; }
   #precip-title {
@@ -333,8 +363,23 @@
       <div class="news-section-list" id="news-yonhap"><span style="color:var(--muted);">Loading…</span></div>
     </div>
     <div class="news-section" style="border-bottom:none;">
-      <div class="news-section-title" style="color:var(--accent);">USD→KRW</div>
-      <div style="font-size:clamp(28px,4vh,46px);font-weight:300;color:#fff;font-variant-numeric:tabular-nums;" id="fx-KRW">--</div>
+      <div class="market-grid">
+        <div class="market-item">
+          <div class="market-label">USD→KRW</div>
+          <div class="market-value" id="fx-KRW">--</div>
+          <div class="market-change" id="fx-KRW-chg"></div>
+        </div>
+        <div class="market-item">
+          <div class="market-label">S&amp;P 500</div>
+          <div class="market-value" id="mkt-sp500">--</div>
+          <div class="market-change" id="mkt-sp500-chg"></div>
+        </div>
+        <div class="market-item">
+          <div class="market-label">KOSPI</div>
+          <div class="market-value" id="mkt-kospi">--</div>
+          <div class="market-change" id="mkt-kospi-chg"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -641,39 +686,51 @@ function initWallpaper() {
 
 
 // ════════════════════════════════════════
-// EXCHANGE RATES  (open.er-api.com, free, no key)
+// MARKETS  (환율 + S&P500 + KOSPI)
 // ════════════════════════════════════════
-const FX_PAIRS = [
-  { id: 'KRW', fmt: v => Math.round(v).toLocaleString() },
-  { id: 'EUR', fmt: v => v.toFixed(4) },
-  { id: 'JPY', fmt: v => v.toFixed(2) },
-  { id: 'GBP', fmt: v => v.toFixed(4) },
-  { id: 'CNY', fmt: v => v.toFixed(4) },
-  { id: 'CAD', fmt: v => v.toFixed(4) },
-];
-let prevFxRates = {};
+function setMarketChange(elId, pct) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+  el.className = 'market-change ' + (pct >= 0 ? 'up' : 'down');
+}
 
 async function fetchFX() {
   try {
     const r = await fetch('https://open.er-api.com/v6/latest/USD');
     const d = await r.json();
     if (d.result !== 'success') return;
-    FX_PAIRS.forEach(({ id, fmt }) => {
-      const rate = d.rates[id];
-      if (!rate) return;
-      const el = document.getElementById(`fx-${id}`);
-      if (!el) return;
-      el.textContent = fmt(rate);
-      if (prevFxRates[id] !== undefined) {
-        const diff = rate - prevFxRates[id];
-        el.className = 'fx-rate ' + (diff > 0 ? 'fx-up' : diff < 0 ? 'fx-down' : 'fx-flat');
-      }
-      prevFxRates[id] = rate;
-    });
-    const now = new Date();
-  } catch(e) {
-    console.error('FX fetch failed', e);
-  }
+    const rate = d.rates['KRW'];
+    if (rate) {
+      const el = document.getElementById('fx-KRW');
+      if (el) el.textContent = Math.round(rate).toLocaleString();
+    }
+  } catch(e) { console.error('FX fetch failed', e); }
+}
+
+async function fetchMarket(symbol, valueId, changeId) {
+  try {
+    const yhUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d`;
+    const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent(yhUrl);
+    const r = await fetch(proxy);
+    const outer = await r.json();
+    const d = JSON.parse(outer.contents);
+    const meta = d.chart.result[0].meta;
+    const price = meta.regularMarketPrice;
+    const prev  = meta.chartPreviousClose;
+    const pct   = ((price - prev) / prev) * 100;
+    const valEl = document.getElementById(valueId);
+    if (valEl) valEl.textContent = price.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    setMarketChange(changeId, pct);
+  } catch(e) { console.error('Market fetch failed', symbol, e); }
+}
+
+async function fetchAllMarkets() {
+  await Promise.all([
+    fetchFX(),
+    fetchMarket('^GSPC', 'mkt-sp500', 'mkt-sp500-chg'),
+    fetchMarket('^KS11', 'mkt-kospi',  'mkt-kospi-chg'),
+  ]);
 }
 
 // ════════════════════════════════════════
@@ -682,12 +739,12 @@ async function fetchFX() {
 (async function init() {
   initWallpaper();
 
-  await Promise.all([fetchWeather(), fetchNews(), fetchFX()]);
+  await Promise.all([fetchWeather(), fetchNews(), fetchAllMarkets()]);
   startNewsScroll();
 
   setInterval(fetchWeather, CFG.weatherRefresh);
   setInterval(async () => { await fetchNews(); startNewsScroll(); }, CFG.newsRefresh);
-  setInterval(fetchFX, 60 * 60 * 1000); // 환율 1시간마다 갱신
+  setInterval(fetchAllMarkets, 60 * 60 * 1000); // 시장 1시간마다 갱신
 
   // Update relative times every minute
   setInterval(() => {
