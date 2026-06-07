@@ -313,7 +313,7 @@
   .title-nyt    { color: #81c784; }
   .title-yonhap { color: #ffb74d; }
   .title-bbc    { color: #e57373; }
-  .news-section-list { flex: 1; min-width: 0; }
+  .news-section-list { flex: 1; min-width: 0; transition: opacity 0.3s ease; }
   .news-item { animation: fadeIn 0.4s ease; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
   .news-headline {
@@ -635,11 +635,12 @@ async function fetchOneFeed(feed) {
 }
 
 let newsBySource = { bbc: [], nyt: [], yonhap: [] };
+let newsIndex = { nyt: 0, yonhap: 0 };
 
 async function fetchNews() {
   for (const feed of CFG.newsFeeds) {
     const items = await fetchOneFeed(feed);
-    newsBySource[feed.id] = items.slice(0, 1);
+    newsBySource[feed.id] = items.slice(0, 5);
     renderSection(feed.id);
     await new Promise(r => setTimeout(r, 1000));
   }
@@ -650,17 +651,28 @@ function renderSection(id) {
   if (!el) return;
   const items = newsBySource[id];
   if (!items.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;">No headlines.</div>'; return; }
-  el.innerHTML = items.map(n => `
-    <div class="news-item">
-      <div class="news-headline">${n.title}</div>
-      <div class="news-time">${relTime(n.pubDate)}</div>
-    </div>
-  `).join('');
+  const idx = newsIndex[id] !== undefined ? newsIndex[id] % items.length : 0;
+  const n = items[idx];
+  el.style.opacity = '0';
+  setTimeout(() => {
+    el.innerHTML = `<div class="news-item"><div class="news-headline">${n.title}</div></div>`;
+    el.style.opacity = '1';
+  }, 300);
 }
 
 function renderNews() {
-  ['nyt','yonhap','bbc'].forEach(renderSection);
+  ['nyt','yonhap'].forEach(renderSection);
 }
+
+// 1분마다 다음 헤드라인으로 순환
+setInterval(() => {
+  ['nyt','yonhap'].forEach(id => {
+    const items = newsBySource[id];
+    if (!items.length) return;
+    newsIndex[id] = (newsIndex[id] + 1) % items.length;
+    renderSection(id);
+  });
+}, 60 * 1000);
 
 // Auto-scroll each section every 10s
 let newsScrollInterval;
