@@ -820,7 +820,7 @@ async function fetchAllMarkets() {
 
   setInterval(fetchWeather, CFG.weatherRefresh);
   setInterval(async () => { await fetchNews(); startNewsScroll(); }, CFG.newsRefresh);
-  setInterval(fetchAllMarkets, 60 * 60 * 1000); // 시장 1시간마다 갱신
+  setInterval(fetchAllMarkets, 5 * 60 * 1000); // 시장 5분마다 갱신
 
   // Update relative times every minute
   setInterval(() => {
